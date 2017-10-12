@@ -1,6 +1,6 @@
 module KnightMoves
   class Node
-    attr_accessor :value, :child
+    attr_accessor :value, :children
     def initialize(value = nil)
       @value = value
       @children = []
@@ -9,14 +9,32 @@ module KnightMoves
     def add_child(value)
       if @value == nil
         @value = value
-      else
+      elsif @value != value && @children.none? {|child| child.value == value} 
         @children << Node.new(value)
       end
     end
 
+    def dfs_rec(node, target, memo = [])
+      if node == nil
+        return
+      elsif node.value == target
+        memo << node.value
+        return memo
+      else
+        memo << node.value
+        node.children.each do |child|
+          dfs_rec(child, target, memo)
+        end
+      end
+    end
   end
 
   class Knight
+
+    def intialize(position)
+      @root = Node.new(position)
+    end
+
     def possible_moves(x,y)
       des = []
       moves = [[1,2], [1,-2], [-1,2], [-1,-2], [2,1], [2,-1], [-2,1], [-2,-1]]
@@ -35,8 +53,17 @@ module KnightMoves
       end
       return false
     end
+
+    def knight_moves(start, goal)
+
+      
+    end
   end
 end
 
-test = KnightMoves::Knight.new
-p test.possible_moves(3,3)
+test = KnightMoves::Node.new
+p test.add_child([1,2])
+p test.add_child([3,1])
+p test.add_child([0,0])
+test.children.each {|child| child.add_child([3,3])}
+p test
