@@ -27,12 +27,50 @@ module KnightMoves
         end
       end
     end
+
+    def breadth_first_search(target)
+      queue = [self]
+      hierarchy = {}
+      node = queue.shift
+      start = node.value
+      if start == target
+        return start
+      end
+      node.children.each do |child|
+        queue.push([child, start])
+      end
+
+      while ! queue.empty?
+        node, parent = queue.shift
+        hierarchy[node.value] = parent
+        if node.value == target
+          return solution_path(start, node.value, hierarchy)
+        else
+          node.children.each do |child|
+            queue.push([child,node.value]) 
+          end
+        end
+      end
+      return nil
+    end
+
+    def solution_path(start, last, hierarchy)
+      path = [last]
+      temp = hierarchy[last]
+      while temp != start
+        path.unshift(temp)
+        temp = hierarchy[temp]
+      end
+      path.unshift(start)
+      return path
+    end
+
+
   end
 
   class Knight
 
-    def intialize(position)
-      @root = Node.new(position)
+    def intialize
     end
 
     def possible_moves(x,y)
@@ -41,7 +79,7 @@ module KnightMoves
       moves.each do |adj|
         a,b = x + adj[0], y + adj[1]
         if valid_move?(a,b)
-          des << [a,b]
+          des.push([a,b])
         end
       end
       return des
@@ -55,15 +93,41 @@ module KnightMoves
     end
 
     def knight_moves(start, goal)
-
-      
+      root = moves_tree(start,goal)
+      path = root.breadth_first_search(goal)
+      puts "You made it in #{path.length - 1} Here's your path:" 
+      path.each {|ele| p ele}
     end
+
+    def moves_tree(start, goal)
+      root = Node.new(start)
+      next_moves = possible_moves(root.value[0],root.value[1])
+      next_moves.each do |position|
+        root.add_child(position)
+      end
+      visited = next_moves
+      temp = root.children
+      next_children = []
+      while ! visited.include?(goal)
+        temp.each do |child|
+          next_moves = possible_moves(child.value[0], child.value[1])
+          next_moves.each do |position|
+            if ! visited.include?(position)
+              child.add_child(position)
+              visited = visited.push(position)
+            end
+          end
+          next_children = next_children + child.children
+        end
+        temp = next_children
+        next_children = []
+      end
+      return root
+
+    end
+
   end
 end
 
-test = KnightMoves::Node.new
-p test.add_child([1,2])
-p test.add_child([3,1])
-p test.add_child([0,0])
-test.children.each {|child| child.add_child([3,3])}
-p test
+test = KnightMoves::Knight.new
+test.knight_moves([0,0],[1,1])
