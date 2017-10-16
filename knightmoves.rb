@@ -130,4 +130,6 @@ module KnightMoves
 end
 
 test = KnightMoves::Knight.new
-test.knight_moves([0,0],[1,1])
+test.knight_moves([3,3],[0,0])
+test.knight_moves([3,3],[4,3])
+test.knight_moves([0,0],[7,7])
